@@ -40,7 +40,7 @@ export function NavigationHUD({
       {/* HUD Header Navigation */}
       <header className="cyber-header interactive">
         <a href="#home" className="cyber-logo" onClick={() => handleNavClick('home')}>
-          SURYA<span>.IO</span>
+          SURYA<span>.P</span>
         </a>
         <nav className="cyber-nav">
           <button

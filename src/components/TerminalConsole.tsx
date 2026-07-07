@@ -77,10 +77,12 @@ export function TerminalConsole({ onClick }: TerminalConsoleProps) {
         e.stopPropagation();
         setHovered(true);
         document.body.style.cursor = 'pointer';
+        window.dispatchEvent(new CustomEvent('cursor:hover', { detail: { active: true, label: 'OPEN' } }));
       }}
       onPointerOut={() => {
         setHovered(false);
         document.body.style.cursor = 'default';
+        window.dispatchEvent(new CustomEvent('cursor:hover', { detail: { active: false } }));
       }}
     >
       {/* Keyboard Base */}

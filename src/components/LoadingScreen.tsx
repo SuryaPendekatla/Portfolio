@@ -30,7 +30,7 @@ export function LoadingScreen() {
     <div className={`loader-overlay ${fade ? 'fade-out' : ''}`}>
       <div className="loader-content">
         <h1 className="loader-logo">
-          SURYA<span>.IO</span>
+          SURYA<span>.P</span>
         </h1>
         <div className="loader-bar-container">
           <div

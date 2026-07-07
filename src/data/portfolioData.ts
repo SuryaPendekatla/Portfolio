@@ -38,6 +38,29 @@ export interface Experience {
   description: string;
 }
 
+type ProjectInput = Omit<Project, 'position'>;
+
+// Arranges project nodes along a shallow crescent (derived from the original 3 hand-placed
+// nodes: edges closer to camera + lower, center further back + higher) so the scene scales to
+// any project count without manual coordinates. The whole arc is shifted left so it clears the
+// "CORE DIAGNOSTICS" HUD sidebar docked on the right.
+function layoutProjects(inputs: ProjectInput[]): Project[] {
+  const maxSpan = 11;
+  const sidebarClearanceOffsetX = -1.3;
+
+  return inputs.map((project, index) => {
+    const spacing = inputs.length > 1 ? Math.min(4.5, maxSpan / (inputs.length - 1)) : 0;
+    const localX = (index - (inputs.length - 1) / 2) * spacing;
+    const z = 0.1235 * localX * localX - 2;
+    const y = 2.5 - 0.0642 * localX * localX;
+
+    return {
+      ...project,
+      position: [localX + sidebarClearanceOffsetX, y, z] as [number, number, number]
+    };
+  });
+}
+
 export const portfolioData = {
   bio: {
     name: "SURYA PENDEKATLA",
@@ -76,7 +99,7 @@ export const portfolioData = {
     }
   ] as Experience[],
 
-  projects: [
+  projects: layoutProjects([
     {
       id: "project-1",
       title: "Quantum Core Dashboard",
@@ -85,7 +108,6 @@ export const portfolioData = {
       details: "This application was built to monitor large-scale cloud deployments. It renders network nodes in real-time, mapping over 10,000 active streams. By combining WebSockets with custom WebGL buffer geometries, users can visualize packet transfers and server load changes dynamically without bottlenecking the CPU.",
       tech: ["React", "Three.js", "WebSockets", "Node.js", "TypeScript"],
       modelType: "globe",
-      position: [-4.5, 1.2, 0.5],
       github: "https://github.com/",
       live: "https://github.com/"
     },
@@ -97,7 +119,6 @@ export const portfolioData = {
       details: "HoloFrame allows interior designers to map physical rooms and instantly overlay 3D furniture models. It leverages WebXR and React Native wrappers to capture point-cloud data. Design sessions are shared collaboratively over peer-to-peer connections for real-time multiplayer drafting.",
       tech: ["React Native", "Expo", "Three.js", "WebXR", "TypeScript"],
       modelType: "phone",
-      position: [0, 2.5, -2],
       github: "https://github.com/",
       live: "https://github.com/"
     },
@@ -109,11 +130,12 @@ export const portfolioData = {
       details: "Aetherial Nexus showcases the power of custom GLSL shaders on the web. By moving physics calculations (vector integration, gravity pulls, and boundary collisions) entirely onto the GPU, the engine renders 100,000 particles at a locked 60fps, responding dynamically to cursor gravity pulls.",
       tech: ["WebGL", "GLSL Shaders", "Three.js", "TypeScript", "Vite"],
       modelType: "orb",
-      position: [4.5, 1.2, 0.5],
       github: "https://github.com/",
       live: "https://github.com/"
     }
-  ] as Project[],
+    // Add as many more projects here as you like — positions are auto-arranged in layoutProjects()
+    // below, no manual coordinates needed. modelType can be "globe" | "phone" | "orb" (repeatable).
+  ]),
 
   skills: [
     {

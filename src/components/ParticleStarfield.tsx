@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function ParticleStarfield() {
+export function ParticleStarfield({ reducedMotion }: { reducedMotion: boolean }) {
   const pointsRef = useRef<THREE.Points>(null);
 
   // Generate random positions and colors for 2000 stars
@@ -45,7 +45,7 @@ export function ParticleStarfield() {
   }, []);
 
   useFrame((state) => {
-    if (pointsRef.current) {
+    if (pointsRef.current && !reducedMotion) {
       // Slow background rotation
       pointsRef.current.rotation.y = state.clock.getElapsedTime() * 0.015;
       pointsRef.current.rotation.x = state.clock.getElapsedTime() * 0.008;

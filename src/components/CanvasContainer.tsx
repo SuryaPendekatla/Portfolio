@@ -1,12 +1,15 @@
 import { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { ParticleStarfield } from './ParticleStarfield';
 import { TerminalConsole } from './TerminalConsole';
 import { ProjectCard } from './ProjectCard';
+import { SpaceshipDogfight } from './SpaceshipDogfight';
 import { portfolioData } from '../data/portfolioData';
 import type { Project } from '../data/portfolioData';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface CanvasContainerProps {
   activeTab: string;
@@ -15,17 +18,23 @@ interface CanvasContainerProps {
   onProjectClick: (project: Project) => void;
 }
 
+const RIM_LIGHT_COLOR: Record<Project['modelType'], string> = {
+  globe: '#00bfff',
+  phone: '#ff2e9a',
+  orb: '#ffaa00'
+};
+
 // Animated glowing orbital ring around the scene center
-function OrbitalRing() {
+function OrbitalRing({ reducedMotion }: { reducedMotion: boolean }) {
   const ringRef = useRef<THREE.Mesh>(null);
   useFrame((state) => {
-    if (ringRef.current) {
+    if (ringRef.current && !reducedMotion) {
       ringRef.current.rotation.z = state.clock.getElapsedTime() * 0.12;
       ringRef.current.rotation.x = 0.4 + Math.sin(state.clock.getElapsedTime() * 0.3) * 0.05;
     }
   });
   return (
-    <mesh ref={ringRef} position={[0, 0.2, 0]}>
+    <mesh ref={ringRef} position={[0, 0.2, 0]} rotation={reducedMotion ? [0.4, 0, 0] : undefined}>
       <torusGeometry args={[5.5, 0.012, 8, 120]} />
       <meshBasicMaterial color="#00f0ff" transparent opacity={0.18} />
     </mesh>
@@ -33,16 +42,16 @@ function OrbitalRing() {
 }
 
 // Secondary magenta ring at a different angle
-function OrbitalRingMagenta() {
+function OrbitalRingMagenta({ reducedMotion }: { reducedMotion: boolean }) {
   const ringRef = useRef<THREE.Mesh>(null);
   useFrame((state) => {
-    if (ringRef.current) {
+    if (ringRef.current && !reducedMotion) {
       ringRef.current.rotation.z = -state.clock.getElapsedTime() * 0.08;
       ringRef.current.rotation.x = -0.6 + Math.sin(state.clock.getElapsedTime() * 0.2) * 0.04;
     }
   });
   return (
-    <mesh ref={ringRef} position={[0, 0.2, 0]}>
+    <mesh ref={ringRef} position={[0, 0.2, 0]} rotation={reducedMotion ? [-0.6, 0, 0] : undefined}>
       <torusGeometry args={[6.5, 0.009, 8, 120]} />
       <meshBasicMaterial color="#ff007f" transparent opacity={0.12} />
     </mesh>
@@ -105,6 +114,8 @@ export function CanvasContainer({
   onTerminalClick,
   onProjectClick
 }: CanvasContainerProps) {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="canvas-container">
       <Canvas
@@ -115,7 +126,11 @@ export function CanvasContainer({
         <color attach="background" args={['#03000b']} />
 
         {/* Dynamic Starfield particles */}
-        <ParticleStarfield />
+        <ParticleStarfield reducedMotion={reducedMotion} />
+
+        {/* Ambient background dogfight, far behind the main scene — skipped under reduced motion
+            since a frozen mid-flight fleet would read as broken rather than intentional */}
+        {!reducedMotion && <SpaceshipDogfight />}
 
         {/* Neon grid floor - gives the scene a cyberpunk ground plane */}
         <Grid
@@ -133,8 +148,8 @@ export function CanvasContainer({
         />
 
         {/* Animated orbital rings for visual depth */}
-        <OrbitalRing />
-        <OrbitalRingMagenta />
+        <OrbitalRing reducedMotion={reducedMotion} />
+        <OrbitalRingMagenta reducedMotion={reducedMotion} />
 
         {/* Ambient environment glow */}
         <ambientLight intensity={0.5} />
@@ -145,9 +160,17 @@ export function CanvasContainer({
         {/* Emissive cyan and pink glows centered in space */}
         <pointLight position={[0, 0, 0]} color="#00f0ff" intensity={1.8} distance={8} />
         <pointLight position={[0, 1.5, -2]} color="#ff007f" intensity={1.2} distance={6} />
-        {/* Additional rim lights for project card nodes */}
-        <pointLight position={[-4.5, 1.2, 0.5]} color="#00bfff" intensity={1.0} distance={4} />
-        <pointLight position={[4.5, 1.2, 0.5]} color="#ffaa00" intensity={1.0} distance={4} />
+        {/* Rim light per project node, colored to match its model type — scales with however many
+            projects exist instead of a fixed pair */}
+        {portfolioData.projects.map((project) => (
+          <pointLight
+            key={`rim-${project.id}`}
+            position={project.position}
+            color={RIM_LIGHT_COLOR[project.modelType]}
+            intensity={1.0}
+            distance={4}
+          />
+        ))}
 
         {/* The Central Cyber Console */}
         <TerminalConsole onClick={onTerminalClick} />
@@ -173,6 +196,18 @@ export function CanvasContainer({
           minDistance={2.5}
           maxDistance={15}
         />
+
+        {/* Neon glow — blooms the bright cyan/magenta emissive elements */}
+        <EffectComposer multisampling={0}>
+          <Bloom
+            luminanceThreshold={0.25}
+            luminanceSmoothing={0.4}
+            intensity={0.85}
+            mipmapBlur
+            radius={0.6}
+          />
+          <Vignette eskil={false} offset={0.15} darkness={0.9} />
+        </EffectComposer>
       </Canvas>
     </div>
   );

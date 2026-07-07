@@ -43,8 +43,15 @@ export function DetailOverlay({
 
   const isOpen = !!selectedProject || activeTab === 'about' || activeTab === 'contact';
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    if (selectedProject) onCloseProject();
+    else if (activeTab === 'about') onCloseAbout();
+    else if (activeTab === 'contact') onCloseContact();
+  };
+
   return (
-    <div className={`modal-backdrop ${isOpen ? 'open' : ''}`}>
+    <div className={`modal-backdrop ${isOpen ? 'open' : ''}`} onClick={handleBackdropClick}>
       {isOpen && (
         <div className="modal-content glass-panel">
 

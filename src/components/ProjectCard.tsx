@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Project } from '../data/portfolioData';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface ProjectCardProps {
   project: Project;
@@ -13,23 +14,28 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   // Animate the floating cards
   useFrame((state) => {
     if (groupRef.current) {
       // Float up/down at slightly different phases based on project id
       const phase = project.id === 'project-1' ? 0 : project.id === 'project-2' ? 1.5 : 3.0;
-      groupRef.current.position.y = project.position[1] + Math.sin(state.clock.getElapsedTime() * 1.5 + phase) * 0.15;
+      groupRef.current.position.y = reducedMotion
+        ? project.position[1]
+        : project.position[1] + Math.sin(state.clock.getElapsedTime() * 1.5 + phase) * 0.15;
     }
     if (modelRef.current) {
-      // Rotate faster on hover
-      const speed = hovered ? 0.8 : 0.25;
-      modelRef.current.rotation.y += speed * 0.05;
-      modelRef.current.rotation.x += speed * 0.02;
+      // Rotate faster on hover (frozen under reduced motion — hover still swaps the wireframe color)
+      if (!reducedMotion) {
+        const speed = hovered ? 0.8 : 0.25;
+        modelRef.current.rotation.y += speed * 0.05;
+        modelRef.current.rotation.x += speed * 0.02;
+      }
 
       // Pulsate scale for the "orb" type
       if (project.modelType === 'orb') {
-        const scale = 0.8 + Math.sin(state.clock.getElapsedTime() * 3) * 0.08;
+        const scale = reducedMotion ? 0.8 : 0.8 + Math.sin(state.clock.getElapsedTime() * 3) * 0.08;
         modelRef.current.scale.set(scale, scale, scale);
       }
     }
@@ -96,10 +102,12 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
         e.stopPropagation();
         setHovered(true);
         document.body.style.cursor = 'pointer';
+        window.dispatchEvent(new CustomEvent('cursor:hover', { detail: { active: true, label: 'VIEW' } }));
       }}
       onPointerOut={() => {
         setHovered(false);
         document.body.style.cursor = 'default';
+        window.dispatchEvent(new CustomEvent('cursor:hover', { detail: { active: false } }));
       }}
     >
       {/* Background backing plane - Holographic card */}

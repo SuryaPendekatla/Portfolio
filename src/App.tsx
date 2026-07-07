@@ -3,7 +3,8 @@ import { CanvasContainer } from './components/CanvasContainer';
 import { LoadingScreen } from './components/LoadingScreen';
 import { NavigationHUD } from './components/NavigationHUD';
 import { DetailOverlay } from './components/DetailOverlay';
-import { portfolioData } from './data/portfolioData';
+import { HeroSection } from './components/HeroSection';
+import { CustomCursor } from './components/CustomCursor';
 import type { Project } from './data/portfolioData';
 
 function App() {
@@ -25,6 +26,9 @@ function App() {
 
   return (
     <>
+      {/* Custom cursor with hover affordance for 3D nodes and UI controls */}
+      <CustomCursor />
+
       {/* Immersive Loading Screen */}
       <LoadingScreen />
 
@@ -52,27 +56,10 @@ function App() {
 
       {/* 2D Hero intro overlay - visible on home tab when not zoomed in on elements */}
       {activeTab === 'home' && !selectedProject && (
-        <section className="home-hero glass-panel">
-          <h1>
-            SURYA <span>PENDEKATLA</span>
-          </h1>
-          <h2>{portfolioData.bio.role}</h2>
-          <p>{portfolioData.bio.tagline}</p>
-          <div className="hero-cta">
-            <button
-              className="btn-primary"
-              onClick={() => setActiveTab('projects')}
-            >
-              System Projects
-            </button>
-            <button
-              className="btn-secondary"
-              onClick={() => setActiveTab('contact')}
-            >
-              Signal Transmit
-            </button>
-          </div>
-        </section>
+        <HeroSection
+          onProjectsClick={() => setActiveTab('projects')}
+          onContactClick={() => setActiveTab('contact')}
+        />
       )}
 
       {/* 2D Detail Modal Overlay System */}

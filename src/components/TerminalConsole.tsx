@@ -2,6 +2,7 @@ import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { portfolioData } from '../data/portfolioData';
+import { playHover, playClick } from '../lib/sfx';
 
 interface TerminalConsoleProps {
   onClick: () => void;
@@ -71,11 +72,13 @@ export function TerminalConsole({ onClick }: TerminalConsoleProps) {
       ref={meshRef}
       onClick={(e) => {
         e.stopPropagation();
+        playClick();
         onClick();
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
         setHovered(true);
+        playHover();
         document.body.style.cursor = 'pointer';
         window.dispatchEvent(new CustomEvent('cursor:hover', { detail: { active: true, label: 'OPEN' } }));
       }}

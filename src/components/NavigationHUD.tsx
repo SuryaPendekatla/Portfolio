@@ -1,5 +1,7 @@
 import { portfolioData } from '../data/portfolioData';
 import type { Project } from '../data/portfolioData';
+import { SoundToggle } from './SoundToggle';
+import { playClick, playHover } from '../lib/sfx';
 
 interface NavigationHUDProps {
   activeTab: string;
@@ -16,6 +18,7 @@ export function NavigationHUD({
 }: NavigationHUDProps) {
 
   const handleNavClick = (tab: string) => {
+    playClick();
     setActiveTab(tab);
     setSelectedProject(null); // Clear selected project to zoom camera back out
   };
@@ -46,28 +49,33 @@ export function NavigationHUD({
           <button
             className={`nav-btn ${activeTab === 'home' && !selectedProject ? 'active' : ''}`}
             onClick={() => handleNavClick('home')}
+            onMouseEnter={() => playHover()}
           >
             Terminal
           </button>
           <button
             className={`nav-btn ${activeTab === 'projects' || selectedProject ? 'active' : ''}`}
             onClick={() => handleNavClick('projects')}
+            onMouseEnter={() => playHover()}
           >
             Projects
           </button>
           <button
             className={`nav-btn ${activeTab === 'about' ? 'active' : ''}`}
             onClick={() => handleNavClick('about')}
+            onMouseEnter={() => playHover()}
           >
             About
           </button>
           <button
             className={`nav-btn ${activeTab === 'contact' ? 'active' : ''}`}
             onClick={() => handleNavClick('contact')}
+            onMouseEnter={() => playHover()}
           >
             Contact
           </button>
         </nav>
+        <SoundToggle />
       </header>
 
       {/* Spatial Help Prompt - appears on home page */}

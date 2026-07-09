@@ -7,6 +7,9 @@ import { ParticleStarfield } from './ParticleStarfield';
 import { TerminalConsole } from './TerminalConsole';
 import { ProjectCard } from './ProjectCard';
 import { SpaceshipDogfight } from './SpaceshipDogfight';
+import { Nebula } from './Nebula';
+import { DistantPlanet } from './DistantPlanet';
+import { ShootingStars } from './ShootingStars';
 import { portfolioData } from '../data/portfolioData';
 import type { Project } from '../data/portfolioData';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -61,10 +64,12 @@ function OrbitalRingMagenta({ reducedMotion }: { reducedMotion: boolean }) {
 // Camera control helper to smoothly interpolate position and lookAt
 function CameraRig({
   activeTab,
-  selectedProject
+  selectedProject,
+  reducedMotion
 }: {
   activeTab: string;
   selectedProject: Project | null;
+  reducedMotion: boolean;
 }) {
   const { camera } = useThree();
   const targetPos = useRef(new THREE.Vector3(0, 0, 8.5));
@@ -99,9 +104,18 @@ function CameraRig({
     }
   }, [activeTab, selectedProject]);
 
-  useFrame(() => {
+  useFrame((state) => {
     camera.position.lerp(targetPos.current, 0.05);
     tempLook.current.lerp(targetLook.current, 0.05);
+
+    // Subtle idle sway on the resting home view — like a game's attract-mode camera, so the
+    // scene still feels alive when the visitor isn't actively navigating
+    if (activeTab === 'home' && !selectedProject && !reducedMotion) {
+      const t = state.clock.getElapsedTime();
+      camera.position.x += Math.sin(t * 0.15) * 0.15;
+      camera.position.y += Math.sin(t * 0.1) * 0.08;
+    }
+
     camera.lookAt(tempLook.current);
   });
 
@@ -125,8 +139,24 @@ export function CanvasContainer({
         {/* Sky / Space background color */}
         <color attach="background" args={['#03000b']} />
 
-        {/* Dynamic Starfield particles */}
+        {/* Dynamic Starfield particles — two depth layers for parallax: a dense distant field and
+            a sparser layer of larger, brighter "near" stars that drift more with the cursor */}
         <ParticleStarfield reducedMotion={reducedMotion} />
+        <ParticleStarfield
+          reducedMotion={reducedMotion}
+          count={200}
+          radiusMin={6}
+          radiusMax={14}
+          size={0.14}
+          opacity={0.9}
+          parallaxStrength={0.35}
+          rotationSpeed={0.5}
+        />
+
+        {/* Colorful nebula backdrop + a distant gas giant, for real space-game atmosphere */}
+        <Nebula reducedMotion={reducedMotion} />
+        <DistantPlanet reducedMotion={reducedMotion} />
+        <ShootingStars reducedMotion={reducedMotion} />
 
         {/* Ambient background dogfight, far behind the main scene — skipped under reduced motion
             since a frozen mid-flight fleet would read as broken rather than intentional */}
@@ -185,7 +215,7 @@ export function CanvasContainer({
         ))}
 
         {/* Camera lerping controls */}
-        <CameraRig activeTab={activeTab} selectedProject={selectedProject} />
+        <CameraRig activeTab={activeTab} selectedProject={selectedProject} reducedMotion={reducedMotion} />
 
         {/* Orbit Controls */}
         <OrbitControls

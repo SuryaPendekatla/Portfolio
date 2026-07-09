@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { portfolioData } from '../data/portfolioData';
 import type { Project, SkillCategory, Experience } from '../data/portfolioData';
+import { playHover, playClick } from '../lib/sfx';
 
 interface DetailOverlayProps {
   activeTab: string;
@@ -32,6 +33,7 @@ export function DetailOverlay({
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
+    playClick();
     setStatus('sending');
     setTimeout(() => {
       setStatus('success');
@@ -58,7 +60,7 @@ export function DetailOverlay({
           {/* ── Project Details ── */}
           {selectedProject && (
             <div>
-              <button className="close-btn" onClick={onCloseProject}>[ CLOSE ]</button>
+              <button className="close-btn" onClick={onCloseProject} onMouseEnter={() => playHover()}>[ CLOSE ]</button>
 
               <div className="project-header">
                 <div>
@@ -101,7 +103,7 @@ export function DetailOverlay({
           {/* ── About & Skills ── */}
           {activeTab === 'about' && !selectedProject && (
             <div>
-              <button className="close-btn" onClick={onCloseAbout}>[ SHUTDOWN ]</button>
+              <button className="close-btn" onClick={onCloseAbout} onMouseEnter={() => playHover()}>[ SHUTDOWN ]</button>
 
               <div className="project-header">
                 <div>
@@ -204,7 +206,10 @@ export function DetailOverlay({
                     <div className="skills-list">
                       {category.skills.map((skill, sidx) => (
                         <div key={sidx} className="skill-row">
-                          <span className="skill-name">{skill.name}</span>
+                          <span className="skill-name">
+                            {skill.name}
+                            <span className="skill-level-badge">LV.{Math.max(1, Math.round(skill.level / 10))}</span>
+                          </span>
                           <div className="skill-bar-bg">
                             <div
                               className="skill-bar-fill"
@@ -227,7 +232,7 @@ export function DetailOverlay({
           {/* ── Contact Terminal ── */}
           {activeTab === 'contact' && !selectedProject && (
             <div>
-              <button className="close-btn" onClick={onCloseContact}>[ DISCONNECT ]</button>
+              <button className="close-btn" onClick={onCloseContact} onMouseEnter={() => playHover()}>[ DISCONNECT ]</button>
 
               <div className="project-header">
                 <div>

@@ -213,6 +213,7 @@ body.custom-cursor-active textarea {
   transition: all 0.2s ease;
   position: relative;
   text-transform: uppercase;
+  overflow: hidden;
 }
 
 .nav-btn:hover, .nav-btn.active {
@@ -235,6 +236,45 @@ body.custom-cursor-active textarea {
 
 .nav-btn:hover::after, .nav-btn.active::after {
   width: 80%;
+}
+
+/* Game-menu shine sweep on hover */
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(0, 240, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.nav-btn:hover::before {
+  left: 130%;
+}
+
+.sound-toggle {
+  font-family: var(--font-hud);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  border-radius: 4px;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+}
+
+.sound-toggle:hover {
+  color: var(--color-cyan);
+  border-color: var(--color-cyan);
+  text-shadow: var(--cyan-glow);
 }
 
 /* Dynamic Instruction Prompt */
@@ -739,27 +779,70 @@ body:has(.modal-backdrop.open) .cyber-status {
 
 .skill-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .skill-name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
+.skill-level-badge {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.05rem;
+  background: rgba(255, 183, 0, 0.08);
+  border: 1px solid rgba(255, 183, 0, 0.3);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+/* Game-style XP bar: chunky segment ticks + an animated shimmer sweep */
 .skill-bar-bg {
-  width: 100px;
-  height: 4px;
+  width: 100%;
+  height: 10px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .skill-bar-fill {
+  position: relative;
   height: 100%;
-  background: var(--color-cyan);
-  box-shadow: var(--cyan-glow);
+  background-color: var(--color-cyan);
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.25) 0px,
+    rgba(0, 0, 0, 0.25) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skill-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background-size: 200% 100%;
+  animation: xpShimmer 2.4s linear infinite;
+}
+
+@keyframes xpShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Contact Terminal Form */
@@ -877,6 +960,63 @@ body:has(.modal-backdrop.open) .cyber-status {
   text-shadow: var(--cyan-glow);
 }
 
+/* Holographic core loader — two counter-rotating arc rings around a pulsing center, echoing the
+   orbital rings and "drag to rotate orbit" motif used in the 3D scene itself */
+.loader-core {
+  position: relative;
+  width: 90px;
+  height: 90px;
+}
+
+.loader-core-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.loader-core-ring-cyan {
+  border-top-color: var(--color-cyan);
+  border-right-color: var(--color-cyan);
+  box-shadow: var(--cyan-glow);
+  animation: coreSpin 2.2s linear infinite;
+}
+
+.loader-core-ring-magenta {
+  inset: 16px;
+  border-bottom-color: var(--color-magenta);
+  border-left-color: var(--color-magenta);
+  box-shadow: var(--magenta-glow);
+  animation: coreSpin 1.6s linear infinite reverse;
+}
+
+.loader-core-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.6), var(--cyan-glow);
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loader-core.static .loader-core-ring,
+.loader-core.static .loader-core-dot {
+  animation: none;
+}
+
+@keyframes coreSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .loader-bar-container {
   width: 100%;
   height: 4px;
@@ -913,6 +1053,61 @@ body:has(.modal-backdrop.open) .cyber-status {
     opacity: 1;
   }
 }
+
+/* Game-style achievement toast */
+.achievement-toast {
+  position: fixed;
+  top: 6rem;
+  right: 1.5rem;
+  z-index: 40;
+  width: 280px;
+  padding: 1rem 1.25rem;
+  background: rgba(5, 2, 15, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-gold);
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(255, 183, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: achievementSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.achievement-toast-label {
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1rem;
+  color: var(--color-gold);
+  margin-bottom: 0.35rem;
+}
+
+.achievement-toast-title {
+  font-family: var(--font-hud);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+  margin-bottom: 0.25rem;
+}
+
+.achievement-toast-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+@keyframes achievementSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Game-style XP-bar skill meters live near .skill-bar-fill above; achievement toasts share the
+   same gold accent as the level badge so both read as one "game HUD" language. */
 
 /* Hide the drag hint on short viewports where it can collide with the hero card's buttons/stats,
    regardless of width — this is a height constraint, not a breakpoint tied to device class.

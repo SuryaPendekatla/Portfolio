@@ -4,6 +4,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Project } from '../data/portfolioData';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { playHover, playClick } from '../lib/sfx';
 
 interface ProjectCardProps {
   project: Project;
@@ -96,11 +97,13 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       position={project.position}
       onClick={(e) => {
         e.stopPropagation();
+        playClick();
         onClick();
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
         setHovered(true);
+        playHover();
         document.body.style.cursor = 'pointer';
         window.dispatchEvent(new CustomEvent('cursor:hover', { detail: { active: true, label: 'VIEW' } }));
       }}

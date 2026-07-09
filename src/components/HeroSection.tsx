@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { portfolioData } from '../data/portfolioData';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { playHover, playClick } from '../lib/sfx';
 
 interface HeroSectionProps {
   onProjectsClick: () => void;
@@ -146,12 +147,23 @@ export function HeroSection({ onProjectsClick, onContactClick }: HeroSectionProp
       </div>
 
       <div className="hero-cta">
-        <button className="btn-primary hero-btn-spring" onClick={onProjectsClick}>
+        <button
+          className="btn-primary hero-btn-spring"
+          onClick={() => {
+            playClick();
+            onProjectsClick();
+          }}
+          onMouseEnter={() => playHover()}
+        >
           System Projects
         </button>
         <button
           className="btn-secondary hero-btn-spring hero-btn-spring-delay"
-          onClick={onContactClick}
+          onClick={() => {
+            playClick();
+            onContactClick();
+          }}
+          onMouseEnter={() => playHover()}
         >
           Signal Transmit
         </button>

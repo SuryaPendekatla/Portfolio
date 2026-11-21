@@ -1,31 +1,37 @@
+export interface ProjectMetric {
+  value: string;
+  label: string;
+}
+
 export interface Project {
   id: string;
   title: string;
   tag: string;
   description: string;
   details: string;
+  highlights: string[];
+  metrics?: ProjectMetric[];
   tech: string[];
   modelType: 'globe' | 'phone' | 'orb';
   position: [number, number, number];
-  github: string;
-  live: string;
-}
-
-export interface Skill {
-  name: string;
-  level: number;
+  // Optional — the "Source Code" / "Live Demo" buttons only render when a link is present
+  github?: string;
+  live?: string;
 }
 
 export interface SkillCategory {
   title: string;
-  skills: Skill[];
+  skills: string[];
 }
 
 export interface Bio {
   name: string;
   role: string;
+  focusAreas: string[];
   tagline: string;
-  experience: string;
+  currentCompany: string;
+  // "YYYY-MM" — the hero's "Months Building AI" counter is computed from this, so it never goes stale
+  aiCareerStart: string;
   location: string;
   status: string;
   summary: string;
@@ -35,7 +41,14 @@ export interface Experience {
   period: string;
   role: string;
   company: string;
-  description: string;
+  points: string[];
+}
+
+export interface Education {
+  period: string;
+  title: string;
+  institution: string;
+  note?: string;
 }
 
 type ProjectInput = Omit<Project, 'position'>;
@@ -61,109 +74,173 @@ function layoutProjects(inputs: ProjectInput[]): Project[] {
   });
 }
 
+// Whole months elapsed since a "YYYY-MM" start month (minimum 1)
+export function monthsSince(startMonth: string, now: Date = new Date()): number {
+  const [year, month] = startMonth.split('-').map(Number);
+  const months = (now.getFullYear() - year) * 12 + (now.getMonth() + 1 - month);
+  return Math.max(1, months);
+}
+
 export const portfolioData = {
   bio: {
     name: "SURYA PENDEKATLA",
     role: "AI Product Engineer",
-    tagline: "Building intelligent products at the intersection of AI, immersive 3D interfaces, and scalable software systems.",
-    experience: "5+ Months Crafting AI Products",
+    focusAreas: ["LLM Applications", "Agentic Workflows", "Generative AI"],
+    tagline: "Building LLM-powered features and agentic workflows that turn creative briefs into structured storyboards and prompts for image and video generation.",
+    currentCompany: "Induce AI",
+    aiCareerStart: "2026-03",
     location: "India",
-    status: "Active // Open to Collaborations",
-    summary: "I am an AI Product Engineer passionate about crafting intelligent, interactive experiences. I build full-stack applications powered by modern AI tooling, combining React, Three.js, and LLM integrations to create products that are both technically robust and visually stunning."
+    status: "Active // Open to Opportunities",
+    summary: "AI Product Engineer at Induce AI, an AI filmmaking startup, building LLM-powered features and agentic workflows that transform creative briefs into structured storyboards and prompts for image and video generation. Hands-on experience with Python, LangGraph, OpenAI and Anthropic APIs, alongside PyTorch, scikit-learn, pandas, FastAPI and React. Focused on prototyping, testing, debugging and deploying AI-powered product features."
   } as Bio,
 
   social: {
     github: "https://github.com/SuryaPendekatla",
     linkedin: "https://www.linkedin.com/in/pendekatla-surya-90158b339",
-    twitter: "https://twitter.com/"
+    email: "pendekatlasurya@gmail.com"
   },
 
   experience: [
     {
-      period: "2024 — PRESENT",
+      period: "MAR 2026 — PRESENT",
       role: "AI Product Engineer",
-      company: "Independent / Freelance",
-      description: "Building AI-powered products and immersive web experiences using LLMs, React, and Three.js. Focused on bridging intelligent automation with premium UI/UX design."
+      company: "Induce AI · AI filmmaking startup",
+      points: [
+        "Build AI-powered product features in Python using OpenAI and Anthropic APIs, working across prototyping, testing, debugging and deployment.",
+        "Develop a cinematic AI pipeline that converts creative briefs into structured, shot-by-shot prompts for image and video generation models, including Veo, Kling, Seedance and Wan.",
+        "Design multi-step, stateful workflows in LangGraph to break complex creative tasks into manageable stages that are easier to control and debug.",
+        "Improve response consistency using structured output formats, reusable prompt templates and iterative testing on practical use cases.",
+        "Collaborate with product and engineering teammates to scope features, prototype solutions and iterate on feedback."
+      ]
     },
     {
-      period: "2023 — 2024",
-      role: "Full-Stack Developer",
-      company: "Startup Ecosystem",
-      description: "Developed scalable web applications with React and Node.js. Integrated AI APIs to automate workflows and surface insights for end users."
-    },
-    {
-      period: "2022 — 2023",
-      role: "Frontend Engineer",
-      company: "Product Studio",
-      description: "Delivered pixel-perfect UI components, animation systems, and responsive design frameworks. Led the adoption of TypeScript across the codebase."
+      period: "APR 2024 — MAR 2025",
+      role: "Electrical Design Engineer Intern",
+      company: "Athul Power Tech Services",
+      points: [
+        "Designed load banks used to discharge batteries under controlled electrical loads for battery testing.",
+        "Contributed to electrical circuit design, applying Electronics and Communication Engineering fundamentals to hardware systems."
+      ]
     }
   ] as Experience[],
 
+  education: [
+    {
+      period: "MAY 2025 — DEC 2025",
+      title: "Full Stack Python Development",
+      institution: "Codegnan",
+      note: "7-month professional training program"
+    },
+    {
+      period: "MAY 2024",
+      title: "B.Tech, Electronics and Communication Engineering",
+      institution: "Ponnaiyah Ramajayam Institute of Science and Technology (PRIST)",
+      note: "CGPA: 7.49 / 10"
+    }
+  ] as Education[],
+
+  certifications: [
+    "Claude course certifications — Anthropic Academy",
+    "Prompt Engineering — DeepLearning.AI"
+  ],
+
   projects: layoutProjects([
     {
-      id: "project-1",
-      title: "Quantum Core Dashboard",
-      tag: "Web App // WebGL",
-      description: "A real-time telemetry dashboard visualizing high-throughput distributed server topologies.",
-      details: "This application was built to monitor large-scale cloud deployments. It renders network nodes in real-time, mapping over 10,000 active streams. By combining WebSockets with custom WebGL buffer geometries, users can visualize packet transfers and server load changes dynamically without bottlenecking the CPU.",
-      tech: ["React", "Three.js", "WebSockets", "Node.js", "TypeScript"],
-      modelType: "globe",
-      github: "https://github.com/",
-      live: "https://github.com/"
-    },
-    {
-      id: "project-2",
-      title: "HoloFrame Spatial AR",
-      tag: "Mobile App // AR",
-      description: "An augmented reality mobile interface for spatial mapping and real-time collaborative architecture planning.",
-      details: "HoloFrame allows interior designers to map physical rooms and instantly overlay 3D furniture models. It leverages WebXR and React Native wrappers to capture point-cloud data. Design sessions are shared collaboratively over peer-to-peer connections for real-time multiplayer drafting.",
-      tech: ["React Native", "Expo", "Three.js", "WebXR", "TypeScript"],
+      id: "shotsense",
+      title: "ShotSense",
+      tag: "Computer Vision // Full-Stack",
+      description: "An AI shot analyzer for filmmakers: detects cuts, classifies shot scale and writes shot breakdowns with video-generation prompts.",
+      details: "ShotSense helps filmmakers break down footage: upload a clip and it finds every cut, labels each shot's scale and writes a structured shot breakdown with prompts ready for video-generation models.",
+      highlights: [
+        "Fine-tuned an ImageNet-pretrained ResNet-18 in PyTorch to classify 7 cinematic shot scales, reaching 57% macro-F1 on a held-out, human-labelled test set — nearly double a scikit-learn HOG + logistic-regression baseline (31%).",
+        "Built and deployed a full-stack app that detects cuts in uploaded videos with OpenCV, classifies each shot via ONNX Runtime and uses an LLM to generate structured shot breakdowns and video-generation prompts.",
+        "Deployed with JWT auth and one-time demo accounts."
+      ],
+      metrics: [
+        { value: "57%", label: "Macro-F1" },
+        { value: "31%", label: "HOG + LR baseline" },
+        { value: "7", label: "Shot scales" }
+      ],
+      tech: ["PyTorch", "scikit-learn", "OpenCV", "ONNX Runtime", "FastAPI", "PostgreSQL", "React", "Docker"],
       modelType: "phone",
-      github: "https://github.com/",
-      live: "https://github.com/"
+      github: "https://github.com/SuryaPendekatla/shotsense",
+      live: "https://shotsense.onrender.com"
     },
     {
-      id: "project-3",
-      title: "Aetherial Nexus Shaders",
-      tag: "Graphics // Physics",
-      description: "A browser-based WebGL physics engine simulating high-density gravity fields and interactive particle fields.",
-      details: "Aetherial Nexus showcases the power of custom GLSL shaders on the web. By moving physics calculations (vector integration, gravity pulls, and boundary collisions) entirely onto the GPU, the engine renders 100,000 particles at a locked 60fps, responding dynamically to cursor gravity pulls.",
-      tech: ["WebGL", "GLSL Shaders", "Three.js", "TypeScript", "Vite"],
+      id: "cineflow-ai",
+      title: "CineFlow AI",
+      tag: "Agentic AI // LLM Pipeline",
+      description: "An agentic LangGraph pipeline that turns a one-line idea into a story bible, shot list and ready-to-paste video-generation prompts.",
+      details: "CineFlow AI takes a one-line idea and expands it, stage by stage, into a story bible, a scene breakdown, a detailed shot list and ready-to-paste video-generation prompts — streaming each stage to the browser as it runs.",
+      highlights: [
+        "Built a LangGraph pipeline that turns a one-line idea into a story bible, scene breakdown and shot list (shot type, camera movement, lens, lighting, sound), then compiles ready-to-paste prompts for Veo, Kling, Seedance and Wan.",
+        "Planned every scene's shots in parallel with LangGraph's Send API, added a reviewer loop that sends flagged scenes back for one revision, and routed stages across Claude, GPT and Gemini with Pydantic structured outputs and graceful fallbacks.",
+        "Deployed with real-time stage streaming and a 26-test suite."
+      ],
+      metrics: [
+        { value: "4", label: "Video models" },
+        { value: "3", label: "LLM providers" },
+        { value: "26", label: "Tests" }
+      ],
+      tech: ["Python", "LangGraph", "FastAPI", "Pydantic", "Claude API", "GPT API", "Gemini API"],
       modelType: "orb",
-      github: "https://github.com/",
-      live: "https://github.com/"
+      github: "https://github.com/SuryaPendekatla/CineFlow-AI",
+      live: "https://cineflow-ai-kp8u.onrender.com"
+    },
+    {
+      id: "corporate-website-revamp",
+      title: "AI-First Corporate Website Revamp",
+      tag: "Frontend // Web",
+      description: "A corporate website rebuilt on a component-driven React and Vite architecture with an animated, responsive interface.",
+      details: "A ground-up rebuild of a corporate website around reusable components, smooth motion and fast page loads across devices.",
+      highlights: [
+        "Rebuilt a corporate website using a component-driven React and Vite architecture with reusable UI components.",
+        "Created a responsive animated interface with Framer Motion and worked on page-load performance across devices."
+      ],
+      tech: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
+      modelType: "globe"
     }
     // Add as many more projects here as you like — positions are auto-arranged in layoutProjects()
-    // below, no manual coordinates needed. modelType can be "globe" | "phone" | "orb" (repeatable).
+    // above, no manual coordinates needed. modelType can be "globe" | "phone" | "orb" (repeatable).
   ]),
 
   skills: [
     {
-      title: "AI & Product",
+      title: "AI & LLM",
       skills: [
-        { name: "LLM Integration / Prompt Eng.", level: 90 },
-        { name: "AI Product Design", level: 85 },
-        { name: "Python / FastAPI", level: 80 },
-        { name: "Data Pipelines", level: 70 }
+        "LLM Application Development",
+        "Prompt Engineering",
+        "Agentic Workflows",
+        "LangGraph",
+        "OpenAI API",
+        "Anthropic (Claude) API",
+        "Structured Outputs",
+        "Vector Databases"
       ]
     },
     {
-      title: "Frontend & 3D",
-      skills: [
-        { name: "React / React Native", level: 95 },
-        { name: "Three.js / React Three Fiber", level: 88 },
-        { name: "TypeScript", level: 90 },
-        { name: "CSS / Animation Systems", level: 85 }
-      ]
+      title: "Machine Learning & Data",
+      skills: ["PyTorch", "scikit-learn", "pandas", "NumPy", "OpenCV"]
     },
     {
-      title: "Backend & DevOps",
-      skills: [
-        { name: "Node.js / Express", level: 80 },
-        { name: "WebSockets / Realtime", level: 78 },
-        { name: "SQL & NoSQL Databases", level: 72 },
-        { name: "Git & Deployment", level: 88 }
-      ]
+      title: "Generative Video Models",
+      skills: ["Veo", "Kling", "Seedance", "Wan"]
+    },
+    {
+      title: "Languages",
+      skills: ["Python", "JavaScript", "SQL", "HTML", "CSS"]
+    },
+    {
+      title: "Backend",
+      skills: ["FastAPI", "Flask", "REST APIs"]
+    },
+    {
+      title: "Frontend",
+      skills: ["React.js", "Vite", "Tailwind CSS", "Framer Motion"]
+    },
+    {
+      title: "Tools",
+      skills: ["n8n", "Git", "GitHub", "Postman", "VS Code", "Vercel"]
     }
   ] as SkillCategory[]
 };

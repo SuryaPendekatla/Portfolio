@@ -1242,3 +1242,247 @@ body:has(.modal-backdrop.open) .cyber-status {
     float: right;
   }
 }
+
+/* ───────────────────────── Resume content blocks ───────────────────────── */
+
+/* Focus-area chips under the typed role in the hero card */
+.hero-focus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: -0.75rem 0 1.25rem;
+  opacity: 0;
+  animation: fadeIn 0.8s ease 0.95s forwards;
+}
+
+.hero-focus-item {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  background: rgba(0, 240, 255, 0.05);
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+}
+
+/* Keep long project titles clear of the absolutely-positioned close button */
+.project-header {
+  padding-right: 8rem;
+}
+
+/* Section headings inside the modal (experience, education, skills, highlights) */
+.section-heading {
+  font-family: var(--font-hud);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-magenta);
+  text-shadow: var(--magenta-glow);
+  text-transform: uppercase;
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Experience / education timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.timeline-period {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  color: var(--color-cyan);
+  letter-spacing: 0.05rem;
+  padding-top: 0.2rem;
+}
+
+.timeline-role {
+  font-family: var(--font-hud);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.timeline-company {
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  color: var(--color-magenta);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+}
+
+.timeline-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Bullet lists with a HUD-style chevron marker */
+.bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+}
+
+.bullet-list li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.bullet-list li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  top: -0.05rem;
+  color: var(--color-cyan);
+  font-weight: 700;
+}
+
+.project-highlights {
+  margin-bottom: 2rem;
+}
+
+.project-highlights li {
+  font-size: 0.9rem;
+}
+
+/* Headline numbers on a project file */
+.project-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin: -0.5rem 0 1.5rem;
+}
+
+.project-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 183, 0, 0.25);
+  background: rgba(255, 183, 0, 0.04);
+  border-radius: 4px;
+}
+
+.project-metric-value {
+  font-family: var(--font-hud);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 0 0 12px rgba(255, 183, 0, 0.35);
+}
+
+.project-metric-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+  color: var(--text-muted);
+}
+
+/* Skill modules: category header + chip cloud */
+.skill-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  text-shadow: 0 0 12px currentColor;
+}
+
+.skill-category-header .skill-level-badge {
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.skill-chip {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 2px solid var(--color-cyan);
+  padding: 0.3rem 0.65rem;
+  border-radius: 3px;
+}
+
+/* Direct contact channels above the compose form */
+.contact-channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-channel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-channel:hover {
+  border-color: var(--color-cyan);
+  box-shadow: var(--cyan-glow);
+}
+
+.contact-channel-label {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  letter-spacing: 0.08rem;
+  color: var(--text-muted);
+}
+
+.contact-channel-value {
+  font-size: 0.85rem;
+  color: var(--color-cyan);
+  overflow-wrap: anywhere;
+}
+
+@media (max-height: 520px) {
+  .hero-focus {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .project-header {
+    padding-right: 0;
+  }
+
+  .project-title {
+    font-size: 1.5rem;
+  }
+
+  .timeline-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+}

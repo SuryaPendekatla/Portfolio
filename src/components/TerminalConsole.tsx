@@ -49,15 +49,16 @@ export function TerminalConsole({ onClick }: TerminalConsoleProps) {
 
     ctx.font = '18px "Orbitron", monospace';
     ctx.fillStyle = '#b6b1c9';
-    ctx.fillText(`IDENTITY: ${portfolioData.bio.name}`, 30, 85);
-    ctx.fillText(`ROLE: ${portfolioData.bio.role.toUpperCase()}`, 30, 115);
-    ctx.fillText('STATUS: SECURE_LINK_CONNECTED', 30, 145);
+    ctx.fillText(`IDENTITY: ${portfolioData.bio.name}`, 30, 82);
+    ctx.fillText(`ROLE: ${portfolioData.bio.role.toUpperCase()}`, 30, 110);
+    ctx.fillText(`BASE: ${portfolioData.bio.currentCompany.toUpperCase()}`, 30, 138);
+    ctx.fillText('STATUS: SECURE_LINK_CONNECTED', 30, 166);
 
     // Blinking cursor / input line
     const blink = Math.floor(state.clock.getElapsedTime() * 2) % 2 === 0;
     ctx.fillStyle = '#ff007f';
     ctx.font = '18px "Orbitron", monospace';
-    ctx.fillText(`> CLICK TO LOG IN${blink ? '_' : ' '}`, 30, 195);
+    ctx.fillText(`> CLICK TO LOG IN${blink ? '_' : ' '}`, 30, 208);
 
     // Border glowing indicator
     ctx.strokeStyle = hovered ? '#ff007f' : '#00f0ff';

@@ -131,8 +131,8 @@ export function NavigationHUD({
           <a href={portfolioData.social.linkedin} target="_blank" rel="noopener noreferrer">
             LINKEDIN
           </a>
-          <a href={portfolioData.social.twitter} target="_blank" rel="noopener noreferrer">
-            TWITTER
+          <a href={`mailto:${portfolioData.social.email}`}>
+            EMAIL
           </a>
         </div>
       </footer>

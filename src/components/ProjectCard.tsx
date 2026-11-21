@@ -20,8 +20,9 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
   // Animate the floating cards
   useFrame((state) => {
     if (groupRef.current) {
-      // Float up/down at slightly different phases based on project id
-      const phase = project.id === 'project-1' ? 0 : project.id === 'project-2' ? 1.5 : 3.0;
+      // Float up/down at slightly different phases, derived from each node's slot on the arc so
+      // neighbours never bob in sync, however many projects there are
+      const phase = project.position[0] * 0.75;
       groupRef.current.position.y = reducedMotion
         ? project.position[1]
         : project.position[1] + Math.sin(state.clock.getElapsedTime() * 1.5 + phase) * 0.15;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { portfolioData } from '../data/portfolioData';
+import { portfolioData, monthsSince } from '../data/portfolioData';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { playHover, playClick } from '../lib/sfx';
 
@@ -24,11 +24,10 @@ export function HeroSection({ onProjectsClick, onContactClick }: HeroSectionProp
   const stats = useMemo(() => {
     const techSet = new Set<string>();
     portfolioData.projects.forEach((p) => p.tech.forEach((t) => techSet.add(t)));
-    const monthsMatch = portfolioData.bio.experience.match(/\d+/);
     return {
       projects: portfolioData.projects.length,
       tech: techSet.size,
-      months: monthsMatch ? parseInt(monthsMatch[0], 10) : 0,
+      months: monthsSince(portfolioData.bio.aiCareerStart),
     };
   }, []);
 
@@ -129,6 +128,12 @@ export function HeroSection({ onProjectsClick, onContactClick }: HeroSectionProp
         <span className="hero-cursor" />
       </h2>
 
+      <div className="hero-focus">
+        {portfolioData.bio.focusAreas.map((area) => (
+          <span key={area} className="hero-focus-item">{area}</span>
+        ))}
+      </div>
+
       <p className="hero-tagline">{portfolioData.bio.tagline}</p>
 
       <div className="hero-stats">
@@ -142,7 +147,7 @@ export function HeroSection({ onProjectsClick, onContactClick }: HeroSectionProp
         </div>
         <div className="hero-stat">
           <span className="hero-stat-value">{counts.months}+</span>
-          <span className="hero-stat-label">Months Active</span>
+          <span className="hero-stat-label">Months in AI</span>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { portfolioData } from '../data/portfolioData';
-import type { Project, SkillCategory, Experience } from '../data/portfolioData';
+import type { Project, SkillCategory, Experience, Education } from '../data/portfolioData';
 import { playHover, playClick } from '../lib/sfx';
 
 interface DetailOverlayProps {
@@ -10,6 +10,9 @@ interface DetailOverlayProps {
   onCloseAbout: () => void;
   onCloseContact: () => void;
 }
+
+// Accent colors cycle per skill category so each block reads as its own "module"
+const CATEGORY_ACCENTS = ['var(--color-magenta)', 'var(--color-cyan)', 'var(--color-gold)'];
 
 export function DetailOverlay({
   activeTab,
@@ -22,7 +25,9 @@ export function DetailOverlay({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+  const [status, setStatus] = useState<'idle' | 'success'>('idle');
+
+  const contactEmail = portfolioData.social.email;
 
   useEffect(() => {
     if (activeTab === 'contact') {
@@ -30,17 +35,19 @@ export function DetailOverlay({
     }
   }, [activeTab]);
 
+  // The site is static (no backend), so the form hands the message to the visitor's own mail
+  // app, pre-addressed and pre-filled — the message is actually delivered once they hit send.
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
     playClick();
-    setStatus('sending');
-    setTimeout(() => {
-      setStatus('success');
-      setName('');
-      setEmail('');
-      setMessage('');
-    }, 1500);
+    const subject = `Portfolio inquiry from ${name}`;
+    const body = `${message}\n\n— ${name}\n${email}`;
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setStatus('success');
+    setName('');
+    setEmail('');
+    setMessage('');
   };
 
   const isOpen = !!selectedProject || activeTab === 'about' || activeTab === 'contact';
@@ -77,26 +84,50 @@ export function DetailOverlay({
 
               <p className="project-body">{selectedProject.details}</p>
 
-              <div className="project-links">
-                <a
-                  href={selectedProject.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Source Code
-                </a>
-                <a
-                  href={selectedProject.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Live Demo
-                </a>
-              </div>
+              {selectedProject.metrics && selectedProject.metrics.length > 0 && (
+                <div className="project-metrics">
+                  {selectedProject.metrics.map((metric, idx) => (
+                    <div key={idx} className="project-metric">
+                      <span className="project-metric-value">{metric.value}</span>
+                      <span className="project-metric-label">{metric.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <h3 className="section-heading">MISSION DEBRIEF // HIGHLIGHTS</h3>
+              <ul className="bullet-list project-highlights">
+                {selectedProject.highlights.map((point, idx) => (
+                  <li key={idx}>{point}</li>
+                ))}
+              </ul>
+
+              {(selectedProject.github || selectedProject.live) && (
+                <div className="project-links">
+                  {selectedProject.github && (
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Source Code
+                    </a>
+                  )}
+                  {selectedProject.live && (
+                    <a
+                      href={selectedProject.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-secondary"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Live Demo
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -120,111 +151,71 @@ export function DetailOverlay({
               <p className="project-body">{portfolioData.bio.summary}</p>
 
               {/* Experience Timeline */}
-              <h3
-                className="category-title"
-                style={{
-                  marginTop: '1.5rem',
-                  marginBottom: '1rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  paddingBottom: '0.5rem'
-                }}
-              >
-                MISSION LOG // EXPERIENCE
-              </h3>
+              <h3 className="section-heading">MISSION LOG // EXPERIENCE</h3>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+              <div className="timeline">
                 {portfolioData.experience.map((exp: Experience, idx: number) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '130px 1fr',
-                      gap: '1rem',
-                      paddingBottom: '1rem',
-                      borderBottom: '1px solid rgba(255,255,255,0.04)'
-                    }}
-                  >
+                  <div key={idx} className="timeline-row">
+                    <div className="timeline-period">{exp.period}</div>
                     <div>
-                      <div
-                        style={{
-                          fontFamily: 'var(--font-hud)',
-                          fontSize: '0.6rem',
-                          color: 'var(--color-cyan)',
-                          letterSpacing: '0.05rem'
-                        }}
-                      >
-                        {exp.period}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        style={{
-                          fontFamily: 'var(--font-hud)',
-                          fontSize: '0.8rem',
-                          fontWeight: 700,
-                          color: '#fff',
-                          marginBottom: '0.2rem'
-                        }}
-                      >
-                        {exp.role}
-                      </div>
-                      <div
-                        style={{
-                          fontFamily: 'var(--font-hud)',
-                          fontSize: '0.65rem',
-                          color: 'var(--color-magenta)',
-                          marginBottom: '0.4rem',
-                          textTransform: 'uppercase'
-                        }}
-                      >
-                        {exp.company}
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                        {exp.description}
-                      </div>
+                      <div className="timeline-role">{exp.role}</div>
+                      <div className="timeline-company">{exp.company}</div>
+                      <ul className="bullet-list">
+                        {exp.points.map((point, pidx) => (
+                          <li key={pidx}>{point}</li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Skills Grid */}
-              <h3
-                className="category-title"
-                style={{
-                  marginBottom: '1rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  paddingBottom: '0.5rem'
-                }}
-              >
-                SYSTEM CAPABILITIES
-              </h3>
+              {/* Education & Certifications */}
+              <h3 className="section-heading">TRAINING LOG // EDUCATION</h3>
 
-              <div className="skills-container">
-                {portfolioData.skills.map((category: SkillCategory, idx: number) => (
-                  <div key={idx} className="skills-category glass-panel">
-                    <h4 className="category-title">{category.title}</h4>
-                    <div className="skills-list">
-                      {category.skills.map((skill, sidx) => (
-                        <div key={sidx} className="skill-row">
-                          <span className="skill-name">
-                            {skill.name}
-                            <span className="skill-level-badge">LV.{Math.max(1, Math.round(skill.level / 10))}</span>
-                          </span>
-                          <div className="skill-bar-bg">
-                            <div
-                              className="skill-bar-fill"
-                              style={{
-                                width: `${skill.level}%`,
-                                backgroundColor: idx === 0 ? 'var(--color-magenta)' : idx === 1 ? 'var(--color-cyan)' : 'var(--color-gold)',
-                                boxShadow: idx === 0 ? 'var(--magenta-glow)' : idx === 1 ? 'var(--cyan-glow)' : '0 0 15px rgba(255,183,0,0.4)'
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+              <div className="timeline">
+                {portfolioData.education.map((edu: Education, idx: number) => (
+                  <div key={idx} className="timeline-row">
+                    <div className="timeline-period">{edu.period}</div>
+                    <div>
+                      <div className="timeline-role">{edu.title}</div>
+                      <div className="timeline-company">{edu.institution}</div>
+                      {edu.note && <div className="timeline-note">{edu.note}</div>}
                     </div>
                   </div>
                 ))}
+                <div className="timeline-row">
+                  <div className="timeline-period">CERTIFICATIONS</div>
+                  <ul className="bullet-list">
+                    {portfolioData.certifications.map((cert, idx) => (
+                      <li key={idx}>{cert}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Skills Grid */}
+              <h3 className="section-heading">SYSTEM CAPABILITIES</h3>
+
+              <div className="skills-container">
+                {portfolioData.skills.map((category: SkillCategory, idx: number) => {
+                  const accent = CATEGORY_ACCENTS[idx % CATEGORY_ACCENTS.length];
+                  return (
+                    <div key={idx} className="skills-category glass-panel">
+                      <h4 className="category-title skill-category-header" style={{ color: accent }}>
+                        {category.title}
+                        <span className="skill-level-badge">{category.skills.length} MODULES</span>
+                      </h4>
+                      <div className="skill-chips">
+                        {category.skills.map((skill, sidx) => (
+                          <span key={sidx} className="skill-chip" style={{ borderLeftColor: accent }}>
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -242,9 +233,37 @@ export function DetailOverlay({
               </div>
 
               <p className="project-body" style={{ marginBottom: '1rem' }}>
-                Fill out the console form below to send a message directly to{' '}
-                <span style={{ color: 'var(--color-cyan)' }}>{portfolioData.bio.name}</span>'s terminal.
+                Open to AI product engineering roles and collaborations. Reach{' '}
+                <span style={{ color: 'var(--color-cyan)' }}>{portfolioData.bio.name}</span> directly on any
+                channel below, or compose a message in the console.
               </p>
+
+              <div className="contact-channels">
+                <a className="contact-channel" href={`mailto:${contactEmail}`} onMouseEnter={() => playHover()}>
+                  <span className="contact-channel-label">EMAIL</span>
+                  <span className="contact-channel-value">{contactEmail}</span>
+                </a>
+                <a
+                  className="contact-channel"
+                  href={portfolioData.social.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playHover()}
+                >
+                  <span className="contact-channel-label">LINKEDIN</span>
+                  <span className="contact-channel-value">in/pendekatla-surya</span>
+                </a>
+                <a
+                  className="contact-channel"
+                  href={portfolioData.social.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playHover()}
+                >
+                  <span className="contact-channel-label">GITHUB</span>
+                  <span className="contact-channel-value">@SuryaPendekatla</span>
+                </a>
+              </div>
 
               {status === 'success' ? (
                 <div
@@ -273,12 +292,14 @@ export function DetailOverlay({
                   >
                     ✓
                   </div>
-                  <h3 className="form-status">TRANSMISSION COMPLETED</h3>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textAlign: 'center' }}>
-                    Signal successfully routed. Gateway response: 200 OK.
+                  <h3 className="form-status">SIGNAL HANDED TO YOUR MAIL CLIENT</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textAlign: 'center', lineHeight: 1.6 }}>
+                    Your email app should now be open with the message ready — hit send there to complete the
+                    transmission. Nothing opened? Write to{' '}
+                    <a href={`mailto:${contactEmail}`} style={{ color: 'var(--color-cyan)' }}>{contactEmail}</a>.
                   </p>
                   <button className="btn-secondary" onClick={() => setStatus('idle')} style={{ marginTop: '1rem' }}>
-                    Send Another Transmission
+                    Compose Another Transmission
                   </button>
                 </div>
               ) : (
@@ -319,10 +340,9 @@ export function DetailOverlay({
                   <button
                     type="submit"
                     className="btn-primary"
-                    disabled={status === 'sending'}
                     style={{ marginTop: '0.5rem' }}
                   >
-                    {status === 'sending' ? 'TRANSMITTING...' : 'SEND SIGNAL'}
+                    SEND SIGNAL
                   </button>
                 </form>
               )}
